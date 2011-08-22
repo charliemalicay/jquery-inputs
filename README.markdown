@@ -2,6 +2,14 @@
 
 jquery-inputs is a jQuery plugin that allows set/get on form inputs using hierarchical JSON structures
 
+Cloned from (http://github.com/dshimkoski/jquery-inputs/ "dshimkoski/jquery-inputs"). 
+
+The folowing additions are made on top of original code:
+* .set() now also stores the default value as $(input element).data['defaultValue']
+ (useful for checking for changes on a per-field basis and coloring the field on-change.)
+* support of underscore and square brackets as separators in input field names is removed. This shaves off a bit of time
+when parsing long forms.
+
 ## Form Element Names
 
 Supports various naming conventions, e.g., demo_field_key, demo.field[key], and demo[field].key
@@ -28,11 +36,11 @@ Create a demo form:
 			<option value="option_b" selected="selected">Option B</option>
 		</select>
 
-		<label><input type="radio" name="demo_radio" value="1" />1</label>
+		<label><input type="radio" name="demo.radio" value="1" />1</label>
 		<label><input type="radio" name="demo.radio" value="2" />2</label>
 
-		<label><input type="checkbox" name="demo_checkbox" value="1" checked="checked" />1</label>
-		<label><input type="checkbox" name="demo[checkbox]" value="2" checked="checked" />2</label>
+		<label><input type="checkbox" name="demo checkbox" value="1" checked="checked" />1</label>
+		<label><input type="checkbox" name="demo.checkbox" value="2" checked="checked" />2</label>
 
 	</form>
 
