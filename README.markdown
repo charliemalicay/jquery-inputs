@@ -5,9 +5,9 @@ jquery-inputs is a jQuery plugin that allows set/get on form inputs using hierar
 Cloned from (http://github.com/dshimkoski/jquery-inputs/ "dshimkoski/jquery-inputs"). 
 
 The folowing additions are made on top of original code:
-* .set() now also stores the default value as $(input element).data['defaultValue']
+*  .set() now also stores the default value as $(input element).data['defaultValue']
  (useful for checking for changes on a per-field basis and coloring the field on-change.)
-* support of underscore and square brackets as separators in input field names is removed. This shaves off a bit of time
+*  support of underscore and square brackets as separators in input field names is removed. This shaves off a bit of time
 when parsing long forms.
 
 ## Form Element Names
