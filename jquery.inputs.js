@@ -15,9 +15,6 @@
 			// jquery form (technically could be any element with nested inputs)
 			var $form = $(this);
 			
-			// scope for processInput() writes
-			var scope = {};
-            
 			// loop through form inputs
 			$form.find(':input').each(function(){
 				
@@ -35,8 +32,7 @@
 				
 				// array of keys representing fully qualified value in json tree
 				var keys = $input.attr('name').split('.')
-                //processInput( $input.attr('name'), null, scope );
-                
+				
 				// use keys for hierarchical lookup
 				for( var i = 0, len = keys.length; i < len; i++ ) {
 					var key = keys[i];
@@ -74,9 +70,8 @@
 			$.each(
 				$(this).serializeArray()
 				, function(){
-                    // expands values in scope
-                    processInput( this.name, this.value, scope );
                     log("This is get's scope for name and values "+ this.name + ' ' + this.value)
+                    processInput( this.name, this.value, scope );
                     log(scope)
                 }
             );

@@ -103,39 +103,8 @@ jQuery(function($){
 				checkbox: ['1', '2']
 			}
 		};
-		
 		deepEqual( actual, expected, 'form set/get returns expected json' );
-		
 	});
-	
-	test('keygen get', function(){
-		
-		var actual = $('#test-keygen').inputs('get');
-		
-		var expected = {
-			values: ['a', 'b', 'c']
-		};
-		
-		deepEqual( actual, expected, 'keygen returns expected json' );
-	
-	});
-	
-	test('keygen set/get', function(){
-		
-		$('#test-keygen').inputs('set', {
-			values: [1, 2, 3]
-		});
-		
-		var actual = $('#test-keygen').inputs('get');
-		
-		var expected = {
-			values: ['1', '2', '3']
-		};
-		
-		deepEqual( actual, expected, 'keygen set/get returns expected json' );
-		
-	});
-	
 });
 </script>
 
