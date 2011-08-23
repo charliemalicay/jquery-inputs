@@ -14,24 +14,21 @@
  * Copyright (c) 2011, Daniel Dotsenko (ddotsenko -[at]- walnutcomputing -[dot]- com )
  */
  (function($, undefined){
-	
-	var methods = {
-		set: function(values) {
-			// jquery form (technically could be any element with nested inputs)
-			var $form = $(this)
-			// loop through form inputs
-			$form.find(':input').each(function(){
-				var $input = $(this)
-				clearInput( $input )
-                
-				var keys = $input.attr('name').split('.')
+
+    var methods = {
+        set: function(values) {
+            // jquery form (technically could be any element with nested inputs)
+            var $form = $(this)
+            // loop through form inputs
+            $form.find(':input').each(function(){
+                var $input = $(this)
+                    , keys = $input.attr('name').split('.')
                     , setflag = true
                     , scope = values
                 keys.forEach( function(key) {
                     try {
                        scope = scope[key]
                        if( scope == undefined ) {
-                           setflag = false
                            throw new TypeError("jQuery.Input: Path traversal in data object for '"+ key +"' of '" + $input.attr('name') + "' was cut short by an incompatible object")
                        }
                     }
@@ -40,101 +37,89 @@
                     }
                 })
                 
-				if( setflag ) {
-					if( $input.is(':checkbox, :radio') ) {
-						if( $.isArray(scope) ) {
-							for( var i = 0, len = scope.length; i < len; i++ ) {
-								$input.filter('[value='+scope[i]+']').attr('checked', true).data('defaultValue', true)
-							}
-						} else {
-							$input.filter('[value='+scope+']').attr('checked', true).data('defaultValue', true)
-						}
-					} else {
-						$input.val(scope).data('defaultValue', scope)
-					}
-				}
-			})
-		},
-		get: function() {
-			// scope for processInput() writes
-			var scope = {}
-			// serialize form values
-			$.each(
-				$(this).serializeArray()
-				, function(){
-					// log("This is get's scope for name and values "+ this.name + ' ' + this.value)
-					// processInput( this.name, this.value, scope )
-					applyValueToScope(this.name, this.value, scope)
-					// log(scope)
-				}
-			)
-			// scope will return value structure
-			return scope
-		}
-	}
+                if ( $input.is(':checkbox, :radio') ) {
+                    $input.attr('checked', false).data('defaultValue', false)
+                    if ( setflag ) {
+                        if ( Array.isArray(scope) ) {
+                            if  ( scope.some( 
+                                    function(item) {
+                                        return ( $input.attr('value') == new String(item) )
+                                    })
+                                ) {
+                                $input.attr('checked', true).data('defaultValue', true)
+                            }
+                        } else if ( $input.attr('value') == new String(scope) ) {
+                            $input.attr('checked', true).data('defaultValue', true)
+                        }
+                    }
+                } else if (setflag) {
+                    $input.val(scope).data('defaultValue', scope)
+                } else {
+                    $input.val('').data('defaultValue', '')
+                }
+            })
+        },
+        get: function() {
+            var scope = {}
+            $.each(
+                $(this).serializeArray()
+                , function(){ applyValueToScope(this.name, this.value, scope) }
+            )
+            return scope
+        }
+    }
 
-	function applyValueToScope(name, value, scope) {
-		var keychain = name.split('.')
-			,lastkey = keychain.pop()
-			,currentscope = scope
-			,tmpscope = currentscope
-		keychain.forEach(function(key){
-			tmpscope = currentscope[key]
-			if (tmpscope == null) {
-				currentscope[key] = {}
-			}
-			else {
-				if (!$.isPlainObject(tmpscope)) {
-					throw new TypeError("Value cannot be assigned to key '"+name+"' as another element on this path terminates with an non-object object.")
-				}
-			}
-			currentscope = currentscope[key]
-		})
+    function applyValueToScope(name, value, scope) {
+        var keychain = name.split('.')
+            ,lastkey = keychain.pop()
+            ,currentscope = scope
+            ,tmpscope = currentscope
+        keychain.forEach(function(key){
+            tmpscope = currentscope[key]
+            if (tmpscope == null) {
+                currentscope[key] = {}
+            }
+            else {
+                if (!$.isPlainObject(tmpscope)) {
+                    throw new TypeError("Value cannot be assigned to key '"+name+"' as another element on this path terminates with an non-object object.")
+                }
+            }
+            currentscope = currentscope[key]
+        })
 
-		// log("Testing pre lastkey for name, value: " + name + " " + value)
-		// log(scope)
-		// log(lastkey)
-		tmpscope = currentscope[lastkey]
-		if (tmpscope == null) {
-			currentscope[lastkey] = value
-		}
-		else {
-			// ok, there is something already set for that key and competes for space with out value.
-			// this may be both ok (it's an array of values, or same exact value)ok, and not ok (any other outcome).
-			// we do NOT create arrays by guessing there should be one.
-			// our scoped value is still in tmpscope from 5+ lines above
-			if (value != tmpscope) {
-				if (Array.isArray(tmpscope) && typeof(value) == 'string') {
-					// we determined earlier that this is going to be a ordered group of values. 
-					// Likely a result of checkbox or radio elem group.
-					if (tmpscope.indexOf(value) == -1) {
-						tmpscope.push(value)
-					}
-				} else if (typeof(value) == 'string' && typeof(tmpscope) == 'string') {
-					currentscope[lastkey] = [tmpscope, value]
-				} else {
-					// log("Offending value:")
-					// log(tmpscope)
-					throw new TypeError("Value cannot be assigned to key '"+name+"' as another element on this path continues with object chain.")
-				}
-			}
-		}
-	}
+        tmpscope = currentscope[lastkey]
+        if (tmpscope == null) {
+            currentscope[lastkey] = value
+        }
+        else {
+            // ok, there is something already set for that key and competes for space with out value.
+            // this may be both ok (it's an array of values, or same exact value)ok, and not ok (any other outcome).
+            // we do NOT create arrays by guessing there should be one.
+            // our scoped value is still in tmpscope from 5+ lines above
+            if (value != tmpscope) {
+                if (Array.isArray(tmpscope) && typeof(value) == 'string') {
+                    // we determined earlier that this is going to be a ordered group of values. 
+                    // Likely a result of checkbox or radio elem group.
+                    if (tmpscope.indexOf(value) == -1) {
+                        tmpscope.push(value)
+                    }
+                } else if (typeof(value) == 'string' && typeof(tmpscope) == 'string') {
+                    currentscope[lastkey] = [tmpscope, value]
+                } else {
+                    // log("Offending value:")
+                    // log(tmpscope)
+                    throw new TypeError("Value cannot be assigned to key '"+name+"' as another element on this path continues with object chain.")
+                }
+            }
+        }
+    }
 
-	function clearInput($input) {
-		if( $input.is(':checkbox, :radio') ) {
-			$input.attr('checked', false)
-		} else {
-			$input.val('')
-		}
-	}
-
-	$.fn.inputs = function(method) {
-		if ( methods[method] ) {
-			return methods[ method ].apply( this, Array.prototype.slice.call( arguments, 1 ))
-		} else {
-			$.error( 'Method ' +  method + ' does not exist on jQuery.inputs' )
-		}
-	}
+    $.fn.inputs = function(method) {
+        if ( methods[method] ) {
+            return methods[ method ].apply( this, Array.prototype.slice.call( arguments, 1 ))
+        } else {
+            $.error( 'Method ' +  method + ' does not exist on jQuery.inputs' )
+        }
+    }
 
 })(jQuery)
