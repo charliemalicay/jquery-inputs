@@ -34,8 +34,9 @@
 				clearInput( $input );
 				
 				// array of keys representing fully qualified value in json tree
-				var keys = processInput( $input.attr('name'), null, scope );
-				
+				var keys = $input.attr('name').split('.')
+                //processInput( $input.attr('name'), null, scope );
+                
 				// use keys for hierarchical lookup
 				for( var i = 0, len = keys.length; i < len; i++ ) {
 					var key = keys[i];
