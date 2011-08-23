@@ -22,35 +22,35 @@
 			// loop through form inputs
 			$form.find(':input').each(function(){
 				var $input = $(this)
-					, lookup = values
-					, update = true
-
 				clearInput( $input )
-
+                
 				var keys = $input.attr('name').split('.')
-				for( var i = 0, len = keys.length; i < len; i++ ) {
-					var key = keys[i]
-					// no need to hunt further
-					if( !lookup[key] ) {
-						// set update to false to indicate failed lookup
-						update = false
-						break
-					}
-					// drill down into value structure
-					lookup = lookup[key]
-				}
-
-				if( update ) {
+                    , setflag = true
+                    , scope = values
+                keys.forEach( function(key) {
+                    try {
+                       scope = scope[key]
+                       if( scope == undefined ) {
+                           setflag = false
+                           throw new TypeError("jQuery.Input: Path traversal in data object for '"+ key +"' of '" + $input.attr('name') + "' was cut short by an incompatible object")
+                       }
+                    }
+                    catch (ex) {
+                       setflag = false
+                    }
+                })
+                
+				if( setflag ) {
 					if( $input.is(':checkbox, :radio') ) {
-						if( $.isArray(lookup) ) {
-							for( var i = 0, len = lookup.length; i < len; i++ ) {
-								$input.filter('[value='+lookup[i]+']').attr('checked', true).data('defaultValue', true)
+						if( $.isArray(scope) ) {
+							for( var i = 0, len = scope.length; i < len; i++ ) {
+								$input.filter('[value='+scope[i]+']').attr('checked', true).data('defaultValue', true)
 							}
 						} else {
-							$input.filter('[value='+lookup+']').attr('checked', true).data('defaultValue', true)
+							$input.filter('[value='+scope+']').attr('checked', true).data('defaultValue', true)
 						}
 					} else {
-						$input.val(lookup).data('defaultValue', lookup)
+						$input.val(scope).data('defaultValue', scope)
 					}
 				}
 			})
