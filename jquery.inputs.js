@@ -17,7 +17,7 @@
 			
 			// scope for processInput() writes
 			var scope = {};
-			
+            
 			// loop through form inputs
 			$form.find(':input').each(function(){
 				
@@ -71,10 +71,15 @@
 			// scope for processInput() writes
 			var scope = {};
 			// serialize form values
-			$.each($(this).serializeArray(), function(){
-				// expands values in scope
-				processInput( this.name, this.value, scope );
-			});
+			$.each(
+				$(this).serializeArray()
+				, function(){
+                    // expands values in scope
+                    processInput( this.name, this.value, scope );
+                    log("This is get's scope for name and values "+ this.name + ' ' + this.value)
+                    log(scope)
+                }
+            );
 			// scope will return value structure
 			return scope;
 		}
