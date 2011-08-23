@@ -49,13 +49,13 @@
 					if( $input.is(':checkbox, :radio') ) {
 						if( $.isArray(lookup) ) {
 							for( var i = 0, len = lookup.length; i < len; i++ ) {
-								$input.filter('[value='+lookup[i]+']').attr('checked', true);
+								$input.filter('[value='+lookup[i]+']').attr('checked', true).data('defaultValue', true)
 							}
 						} else {
-							$input.filter('[value='+lookup+']').attr('checked', true);
+							$input.filter('[value='+lookup+']').attr('checked', true).data('defaultValue', true)
 						}
 					} else {
-						$input.val(lookup);
+						$input.val(lookup).data('defaultValue', lookup)
 					}
 				}
 			});
