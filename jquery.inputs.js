@@ -51,9 +51,7 @@
 				
 				// lookup succeeded
 				if( update ) {
-					
 					//console.log('setting value', keys.slice(0, i + 1).join('_'), lookup);
-					
 					if( $input.is(':checkbox, :radio') ) {
 						if( $.isArray(lookup) ) {
 							for( var i = 0, len = lookup.length; i < len; i++ ) {
@@ -65,39 +63,30 @@
 					} else {
 						$input.val(lookup);
 					}
-					
 				}
-				
 			});
-			
 		},
 		get: function() {
-			
 			// scope for processInput() writes
 			var scope = {};
-			
 			// serialize form values
 			$.each($(this).serializeArray(), function(){
 				// expands values in scope
 				processInput( this.name, this.value, scope );
 			});
-			
 			// scope will return value structure
 			return scope;
-			
 		}
 	};
-	
+
 	function clearInput($input) {
-		
 		if( $input.is(':checkbox, :radio') ) {
 			$input.attr('checked', false);
 		} else {
 			$input.val('');
 		}
-		
 	}
-	
+    
 	function processInput(name, value, scope) {
 		
 		// keys used to build normalized name

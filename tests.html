@@ -4,6 +4,21 @@
 
 <script src="http://code.jquery.com/jquery-1.6.min.js"></script>
 <script type="text/javascript" src="http://code.jquery.com/qunit/git/qunit.js"></script>
+<script type="text/javascript">
+// usage: log('inside coolFunc', this, arguments);
+// paulirish.com/2009/log-a-lightweight-wrapper-for-consolelog/
+window.log = function() {
+    log.history = log.history || [];   // store logs to an array for reference
+    log.history.push(arguments);
+    if (this.console) {
+        arguments.callee = arguments.callee.caller;
+        var newarr = [].slice.call(arguments);
+        (typeof console.log === 'object' ? log.apply.call(console.log, console, newarr) : console.log.apply(console, newarr));
+    }
+};
+// make it safe to use console.log always
+(function(b) { function c() { } for (var d = "assert,count,debug,dir,dirxml,error,exception,group,groupCollapsed,groupEnd,info,log,timeStamp,profile,profileEnd,time,timeEnd,trace,warn".split(","), a; a = d.pop(); ) { b[a] = b[a] || c } })((function() {try { console.log(); return window.console; } catch (err) {return window.console = {};}})());
+</script>
 <link rel="stylesheet" href="http://code.jquery.com/qunit/git/qunit.css" type="text/css" media="screen" />
 
 <script src="jquery.inputs.js"></script>
@@ -98,7 +113,7 @@ jQuery(function($){
 		var actual = $('#test-keygen').inputs('get');
 		
 		var expected = {
-			values: {0: 'a', 1: 'b', 2: 'c'}
+			values: ['a', 'b', 'c']
 		};
 		
 		deepEqual( actual, expected, 'keygen returns expected json' );
@@ -108,13 +123,13 @@ jQuery(function($){
 	test('keygen set/get', function(){
 		
 		$('#test-keygen').inputs('set', {
-			values: {0: 1, 1: 2, 2: 3}
+			values: [1, 2, 3]
 		});
 		
 		var actual = $('#test-keygen').inputs('get');
 		
 		var expected = {
-			values: {0: '1', 1: '2', 2: '3'}
+			values: ['1', '2', '3']
 		};
 		
 		deepEqual( actual, expected, 'keygen set/get returns expected json' );
@@ -136,28 +151,28 @@ jQuery(function($){
 <div id="qunit-fixture"> 
 	<form id="test-form">
 
-		<input type="text" name="test_text" value="textval" />
+		<input type="text" name="test.text" value="textval" />
 
-		<textarea name="test_textarea">textareaval</textarea>
+		<textarea name="test.textarea">textareaval</textarea>
 
-		<select name="test[select].options" multiple="multiple">
+		<select name="test.select.options" multiple="multiple">
 			<option value="a" selected="selected">Option A</option>
 			<option value="b" selected="selected">Option B</option>
 		</select>
 
-		<label><input type="radio" name="test_radio" value="1" />1</label>
-		<label><input type="radio" name="test[radio]" value="2" checked="checked" />2</label>
+		<label><input type="radio" name="test.radio" value="1" />1</label>
+		<label><input type="radio" name="test.radio" value="2" checked="checked" />2</label>
 		<label><input type="radio" name="test.radio" value="3" />3</label>
 
-		<label><input type="checkbox" name="test[checkbox]" value="1" checked="checked" />1</label>
-		<label><input type="checkbox" name="test_checkbox" value="2" />2</label>
+		<label><input type="checkbox" name="test.checkbox" value="1" checked="checked" />1</label>
+		<label><input type="checkbox" name="test.checkbox" value="2" />2</label>
 		<label><input type="checkbox" name="test.checkbox" value="3" checked="checked" />3</label>
 
 	</form>
 	<form id="test-keygen">
-		<input type="text" name="values[]" value="a" />
-		<input type="text" name="values[]" value="b" />
-		<input type="text" name="values[]" value="c" />
+		<input type="text" name="values" value="a" />
+		<input type="text" name="values" value="b" />
+		<input type="text" name="values" value="c" />
 	</form>
 </div>
 
