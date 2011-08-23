@@ -18,34 +18,29 @@
 	var methods = {
 		set: function(values) {
 			// jquery form (technically could be any element with nested inputs)
-			var $form = $(this);
+			var $form = $(this)
 			// loop through form inputs
 			$form.find(':input').each(function(){
-				// jquery input
-				var $input = $(this);
-				// reference value structure
-				var lookup = values;
-				// set update flag to true
-				var update = true;
-				// clear input
-				clearInput( $input );
-				// array of keys representing fully qualified value in json tree
+				var $input = $(this)
+					, lookup = values
+					, update = true
+
+				clearInput( $input )
+
 				var keys = $input.attr('name').split('.')
-				// use keys for hierarchical lookup
 				for( var i = 0, len = keys.length; i < len; i++ ) {
-					var key = keys[i];
+					var key = keys[i]
 					// no need to hunt further
 					if( !lookup[key] ) {
 						// set update to false to indicate failed lookup
-						update = false;
-						break;
+						update = false
+						break
 					}
 					// drill down into value structure
-					lookup = lookup[key];
+					lookup = lookup[key]
 				}
-				// lookup succeeded
+
 				if( update ) {
-					//console.log('setting value', keys.slice(0, i + 1).join('_'), lookup);
 					if( $input.is(':checkbox, :radio') ) {
 						if( $.isArray(lookup) ) {
 							for( var i = 0, len = lookup.length; i < len; i++ ) {
@@ -58,25 +53,25 @@
 						$input.val(lookup).data('defaultValue', lookup)
 					}
 				}
-			});
+			})
 		},
 		get: function() {
 			// scope for processInput() writes
-			var scope = {};
+			var scope = {}
 			// serialize form values
 			$.each(
 				$(this).serializeArray()
 				, function(){
 					// log("This is get's scope for name and values "+ this.name + ' ' + this.value)
-					// processInput( this.name, this.value, scope );
+					// processInput( this.name, this.value, scope )
 					applyValueToScope(this.name, this.value, scope)
 					// log(scope)
 				}
-			);
+			)
 			// scope will return value structure
-			return scope;
+			return scope
 		}
-	};
+	}
 
 	function applyValueToScope(name, value, scope) {
 		var keychain = name.split('.')
@@ -128,18 +123,18 @@
 
 	function clearInput($input) {
 		if( $input.is(':checkbox, :radio') ) {
-			$input.attr('checked', false);
+			$input.attr('checked', false)
 		} else {
-			$input.val('');
+			$input.val('')
 		}
 	}
 
 	$.fn.inputs = function(method) {
 		if ( methods[method] ) {
-			return methods[ method ].apply( this, Array.prototype.slice.call( arguments, 1 ));
+			return methods[ method ].apply( this, Array.prototype.slice.call( arguments, 1 ))
 		} else {
-			$.error( 'Method ' +  method + ' does not exist on jQuery.inputs' );
+			$.error( 'Method ' +  method + ' does not exist on jQuery.inputs' )
 		}
-	};
+	}
 
-})(jQuery);
+})(jQuery)
