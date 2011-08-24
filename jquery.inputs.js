@@ -15,61 +15,34 @@
  */
  (function($, undefined){
 
-    var methods = {
-        set: function(values) {
-            // jquery form (technically could be any element with nested inputs)
-            var $form = $(this)
-            // loop through form inputs
-            $form.find(':input').each(function(){
-                var $input = $(this)
-                    , keys = $input.attr('name').split('.')
-                    , setflag = true
-                    , scope = values
-                keys.forEach( function(key) {
-                    try {
-                       scope = scope[key]
-                       if( scope == undefined ) {
-                           throw new TypeError("jQuery.Input: Path traversal in data object for '"+ key +"' of '" + $input.attr('name') + "' was cut short by an incompatible object")
-                       }
-                    }
-                    catch (ex) {
-                       setflag = false
-                    }
-                })
-                
-                if ( $input.is(':checkbox, :radio') ) {
-                    $input.attr('checked', false).data('defaultValue', false)
-                    if ( setflag ) {
-                        if ( Array.isArray(scope) ) {
-                            if  ( scope.some( 
-                                    function(item) {
-                                        return ( $input.attr('value') == new String(item) )
-                                    })
-                                ) {
-                                $input.attr('checked', true).data('defaultValue', true)
-                            }
-                        } else if ( $input.attr('value') == new String(scope) ) {
-                            $input.attr('checked', true).data('defaultValue', true)
-                        }
-                    }
-                } else if (setflag) {
-                    $input.val(scope).data('defaultValue', scope)
-                } else {
-                    $input.val('').data('defaultValue', '')
-                }
-            })
-        },
-        get: function() {
-            var scope = {}
-            $.each(
-                $(this).serializeArray()
-                , function(){ applyValueToScope(this.name, this.value, scope) }
-            )
-            return scope
+    var getfn = function(jqselector) {
+        /* when provided, jqselector is a string that allows to select only input elements that are children of 
+        the stated selector. The selector is still evaluated in the context of "this" - the element on which you call .inputs('get')
+        Example calls with selector:
+        $(elem).inputs('get', '.changed')
+        This way only :input-matching elems that either have class 'changed' or are children of elems with class 'changed'
+        will be selected.
+        */
+        log(this)
+        var $i
+        if (jqselector) {
+            $i = $(jqselector, this) // 'this' can be non-form. $.serialize* do not work on non-form or non-input obj. 
+            $i = $i.filter(':input').add($i.find(':input'))
+        } else {
+            $i = $(':input', this) // 'this' can be non-form. $.serialize* do not work on non-form or non-input obj. 
         }
+
+        var scope = {}
+        $.each(
+            $i.serializeArray()
+            , function(){ 
+                applyValueToScope(this.name, this.value, scope) 
+            }
+        )
+        return scope
     }
 
-    function applyValueToScope(name, value, scope) {
+    var applyValueToScope = function(name, value, scope) {
         var keychain = name.split('.')
             ,lastkey = keychain.pop()
             ,currentscope = scope
@@ -112,6 +85,55 @@
                 }
             }
         }
+    }
+    
+    var setfn = function(values) {
+        // jquery form (technically could be any element with nested inputs)
+        var $form = $(this)
+        // loop through form inputs
+        $form.find(':input').each(function(){
+            var $input = $(this)
+                , keys = $input.attr('name').split('.')
+                , setflag = true
+                , scope = values
+            keys.forEach( function(key) {
+                try {
+                   scope = scope[key]
+                   if( scope == undefined ) {
+                       throw new TypeError("jQuery.Input: Path traversal in data object for '"+ key +"' of '" + $input.attr('name') + "' was cut short by an incompatible object")
+                   }
+                }
+                catch (ex) {
+                   setflag = false
+                }
+            })
+            
+            if ( $input.is(':checkbox, :radio') ) {
+                $input.attr('checked', false).data('defaultValue', false)
+                if ( setflag ) {
+                    if ( Array.isArray(scope) ) {
+                        if  ( scope.some( 
+                                function(item) {
+                                    return ( $input.attr('value') == new String(item) )
+                                })
+                            ) {
+                            $input.attr('checked', true).data('defaultValue', true)
+                        }
+                    } else if ( $input.attr('value') == new String(scope) ) {
+                        $input.attr('checked', true).data('defaultValue', true)
+                    }
+                }
+            } else if (setflag) {
+                $input.val(scope).data('defaultValue', scope)
+            } else {
+                $input.val('').data('defaultValue', '')
+            }
+        })
+    }
+ 
+    var methods = {
+        set: setfn,
+        get: getfn
     }
 
     $.fn.inputs = function(method) {
