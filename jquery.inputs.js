@@ -43,7 +43,7 @@
     }
 
     var applyValueToScope = function(name, value, scope) {
-        var keychain = name.split('.')
+        var keychain = name.replace('_','.').split('.')
             ,lastkey = keychain.pop()
             ,currentscope = scope
             ,tmpscope = currentscope
@@ -93,7 +93,7 @@
         // loop through form inputs
         $form.find(':input').each(function(){
             var $input = $(this)
-                , keys = $input.attr('name').split('.')
+                , keys = $input.attr('name').replace('_','.').split('.')
                 , setflag = true
                 , scope = values
             keys.forEach( function(key) {
