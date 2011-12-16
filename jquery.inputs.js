@@ -23,7 +23,6 @@
         This way only :input-matching elems that either have class 'changed' or are children of elems with class 'changed'
         will be selected.
         */
-        log(this)
         var $i
         if (jqselector) {
             $i = $(jqselector, this) // 'this' can be non-form. $.serialize* do not work on non-form or non-input obj. 
@@ -79,8 +78,6 @@
                 } else if (typeof(value) == 'string' && typeof(tmpscope) == 'string') {
                     currentscope[lastkey] = [tmpscope, value]
                 } else {
-                    // log("Offending value:")
-                    // log(tmpscope)
                     throw new TypeError("Value cannot be assigned to key '"+name+"' as another element on this path continues with object chain.")
                 }
             }
