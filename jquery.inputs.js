@@ -109,18 +109,18 @@
             })
             
             if ( $input.is(':checkbox, :radio') ) {
-                $input.attr('checked', false).data('defaultValue', false)
+                $input.prop('checked', false).data('defaultValue', false)
                 if ( setflag ) {
                     if ( Array.isArray(scope) ) {
                         if  ( scope.some( 
                                 function(item) {
-                                    return ( $input.attr('value') == new String(item) )
+                                    return ( $input.prop('value') == new String(item) )
                                 })
                             ) {
-                            $input.attr('checked', true).data('defaultValue', true)
+                            $input.prop('checked', true).data('defaultValue', true)
                         }
-                    } else if ( $input.attr('value') == new String(scope) ) {
-                        $input.attr('checked', true).data('defaultValue', true)
+                    } else if ( $input.prop('value') == new String(scope) ) {
+                        $input.prop('checked', true).data('defaultValue', true)
                     }
                 }
             } else if (setflag) {
