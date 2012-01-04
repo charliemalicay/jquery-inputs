@@ -11,7 +11,7 @@
  */
 (function(){
 	var window = this
-	, jquery_input_appender = function($){
+	, jquery_inputs_appender = function($){
 
 		var getfn = function(jqselector) {
 			/* when provided, jqselector is a string that allows to select only input elements that are children of 
@@ -141,7 +141,7 @@
 	
 	if ( typeof define === "function" && define.amd != null) {
 		// AMD-loader compatible resource declaration
-		define(['jquery'], function($){return jquery_input_appender($) /*returning jQuery back, with plugin attached.*/} )
+		define(['jquery'], function($){if($.fn.inputs == null){return jquery_inputs_appender($)}else{return $}} )
 	} else {
 		// global-polluting outcome.
 		jquery_input_appender(window.jQuery)
