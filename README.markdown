@@ -2,7 +2,7 @@
 
 jquery-inputs is a jQuery plugin that allows to set/get form inputs using hierarchical JSON structures
 
-This version is a (significant rewrite of and) a deviation on [dshimkoski/jquery-inputs](http://github.com/dshimkoski/jquery-inputs/ "dshimkoski/jquery-inputs"). 
+This version is a (significant rewrite of and a) deviation on [dshimkoski/jquery-inputs](http://github.com/dshimkoski/jquery-inputs/ "dshimkoski/jquery-inputs"). 
 
 The following backward-INcompatible changes were made on top on original code:
 

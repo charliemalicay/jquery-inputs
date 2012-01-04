@@ -13,32 +13,7 @@
 	var window = this
 	, jquery_inputs_appender = function($){
 
-		var getfn = function(jqselector) {
-			/* when provided, jqselector is a string that allows to select only input elements that are children of 
-			the stated selector. The selector is still evaluated in the context of "this" - the element on which you call .inputs('get')
-			Example calls with selector:
-			$(elem).inputs('get', '.changed')
-			This way only :input-matching elems that either have class 'changed' or are children of elems with class 'changed'
-			will be selected.
-			*/
-			var $i
-			if (jqselector) {
-				$i = $(jqselector, this) // 'this' can be non-form. $.serialize* do not work on non-form or non-input obj. 
-				$i = $i.filter(':input').add($i.find(':input'))
-			} else {
-				$i = $(':input', this) // 'this' can be non-form. $.serialize* do not work on non-form or non-input obj. 
-			}
-	
-			var scope = {}
-			$.each(
-				$i.serializeArray()
-				, function(){ 
-					applyValueToScope(this.name, this.value, scope) 
-				}
-			)
-			return scope
-		}
-		, applyValueToScope = function(name, value, scope) {
+		var applyValueToScope = function(name, value, scope) {
 			var keychain = name.replace('_','.').split('.')
 				,lastkey = keychain.pop()
 				,currentscope = scope
@@ -55,7 +30,6 @@
 				}
 				currentscope = currentscope[key]
 			})
-	
 			tmpscope = currentscope[lastkey]
 			if (tmpscope == null) {
 				currentscope[lastkey] = value
@@ -79,6 +53,31 @@
 					}
 				}
 			}
+		}
+		, getfn = function(jqselector) {
+			/* when provided, jqselector is a string that allows to select only input elements that are children of 
+			the stated selector. The selector is still evaluated in the context of "this" - the element on which you call .inputs('get')
+			Example calls with selector:
+			$(elem).inputs('get', '.changed')
+			This way only :input-matching elems that either have class 'changed' or are children of elems with class 'changed'
+			will be selected.
+			*/
+			var $i
+			if (jqselector) {
+				$i = $(jqselector, this) // 'this' can be non-form. $.serialize* do not work on non-form or non-input obj. 
+				$i = $i.filter(':input').add($i.find(':input'))
+			} else {
+				$i = $(':input', this) // 'this' can be non-form. $.serialize* do not work on non-form or non-input obj. 
+			}
+	
+			var scope = {}
+			$.each(
+				$i.serializeArray()
+				, function(){ 
+					applyValueToScope(this.name, this.value, scope) 
+				}
+			)
+			return scope
 		}
 		, setfn = function(values) {
 			// jquery form (technically could be any element with nested inputs)
@@ -144,7 +143,7 @@
 		define(['jquery'], function($){if($.fn.inputs == null){return jquery_inputs_appender($)}else{return $}} )
 	} else {
 		// global-polluting outcome.
-		jquery_input_appender(window.jQuery)
+		jquery_inputs_appender(window.jQuery)
 	}
 
 }).call(this)
