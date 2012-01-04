@@ -4,19 +4,21 @@ jquery-inputs is a jQuery plugin that allows to set/get form inputs using hierar
 
 This version is a (significant rewrite of and) deviation of [dshimkoski/jquery-inputs](http://github.com/dshimkoski/jquery-inputs/ "dshimkoski/jquery-inputs"). 
 
+
 The following backward-INcompatible changes were made on top of original code:
-*  .set() now also stores the default value as $(input element).data['defaultValue']
+*   .set() now also stores the default value as $(input element).data['defaultValue']
 (useful for checking for changes on a per-field basis and coloring the field on-change.)
-*  support of underscore and square brackets as separators in input field names is removed. This shaves off a bit of time
+*   support of underscore and square brackets as separators in input field names is removed. This shaves off a bit of time
 when parsing long forms. Only dot (".") and underscore ("_") chars are now supported as key names separator.
-*  plugin now relies on some JavaScript 1.6+ methods of Object, Array objects. This means you must load a shim
+*   plugin now relies on some JavaScript 1.6+ methods of Object, Array objects. This means you must load a shim
 (like augment.js) for older browsers (IE less than 9). (Test for Array.isArray and Array.prototype.indexOf
 support as indicators of needing a shim.)
-*  Tunned for operation against jQuery 1.6+ where there is a tangible difference between .attr and .prop. Plugin
+*   Tunned for operation against jQuery 1.6+ where there is a tangible difference between .attr and .prop. Plugin
 is not tested against earlier versions, which are subjectively considered not to exist.
-*  Plugin is now AMD-loader compatible. You can now simply require(['jquery.inputs'], function($){ /* do things with $ */})
+*   Plugin is now AMD-loader compatible. You can now simply require(['jquery.inputs'], function($){ /* do things with $ */})
 We require 'jquery' internally. Please, insure that you hard-define 'jquery' before loading this plugin 
 by define('jquery', ...   or by setting up a 'path' for it as 'jqeury' in AMD loader's config.
+
 
 ## Usage
 
@@ -64,7 +66,7 @@ Set/get values via javascript:
 
 See tests for more examples.
 
-## Authors
+## License, Copyright
 
 [MIT License](http://www.opensource.org/licenses/mit-license.php)
 
