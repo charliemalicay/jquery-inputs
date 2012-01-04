@@ -80,19 +80,21 @@
 			return scope
 		}
 		, setfn = function(values) {
-			// jquery form (technically could be any element with nested inputs)
+			// could be any element with nested inputs)
 			var $form = $(this)
-			// loop through form inputs
-			$form.find(':input').each(function(){
+			// loop through form inputs.
+			// this convoluted selector allows us to find inputs
+			// directly in already-selected elements and in their descendants.
+			$form.find(':input').add($form.filter(':input')).each(function(){
 				var $input = $(this)
-					, keys = $input.attr('name').replace('_','.').split('.')
-					, setflag = true
-					, scope = values
+				, keys = $input.prop('name').replace('_','.').split('.')
+				, setflag = true
+				, scope = values
 				keys.forEach( function(key) {
 					try {
 					   scope = scope[key]
 					   if( scope == undefined ) {
-						   throw new TypeError("jQuery.Input: Path traversal in data object for '"+ key +"' of '" + $input.attr('name') + "' was cut short by an incompatible object")
+						   throw new TypeError("jQuery.Input: Path traversal in data object for '"+ key +"' of '" + $input.prop('name') + "' was cut short by an incompatible object")
 					   }
 					}
 					catch (ex) {
@@ -118,7 +120,15 @@
 				} else if (setflag) {
 					$input.val(scope).data('defaultValue', scope)
 				} else {
-					$input.val('').data('defaultValue', '')
+					// we are here when data does not contain value for this field.
+					// we are going to pull default value from HTML itself.
+					// if 'value="some default"' was provided in the HTML, we will use that.
+					// this is good for forms that deal with amounts, where default value
+					// is not "" but something like "0.00" and is specified right in the HTML.
+					var df = $input[0].defaultValue
+					// we are going to mirror that in $.data on the field as well, for
+					// centralized default management.
+					$input.val(df).data('defaultValue', df)
 				}
 			})
 		}

@@ -6,11 +6,15 @@ This version is a (significant rewrite of and a) deviation on [dshimkoski/jquery
 
 The following backward-INcompatible changes were made on top on original code:
 
+*   The version of jquery-inputs from which this one was cloned did NOT seem work when .Get() was called on non-Form jQuery elem array (i.e. div, containing a set of input elems). (Happened because $.serialize() does not work on non-input or non-form elems)
+    This version allows the passed in jQuery elems (for both .Set() and .Get()) to be a mix of inputs elems AND, at the same time, non-Form "parent" elems containing input elems. We .filter(":input") then join that to .find(":input") meaning siblings (within the passed in jQuery array set) as well as their children input elems are picked up.
 *   .set() now also stores the default value as $(input element).data['defaultValue'] (useful for checking for changes on a per-field basis and coloring the field on-change.)
 *   support of underscore and square brackets as separators in input field names is removed. This shaves off a bit of time when parsing long forms. Only dot (".") and underscore ("_") chars are now supported as key names separator.
 *   plugin now relies on some JavaScript 1.6+ methods of Object, Array objects. This means you must load a shim (like augment.js) for older browsers (IE less than 9). (Test for Array.isArray and Array.prototype.indexOf support as indicators of needing a shim.)
 *   Tunned for operation against jQuery 1.6+ where there is a tangible difference between .attr and .prop. Plugin is not tested against earlier versions, which are subjectively considered not to exist.
 *   Plugin is now AMD-loader compatible. You can now simply require(['jquery.inputs'], function($){ /* do things with $ */}) We require 'jquery' internally. Please, insure that you hard-define 'jquery' before loading this plugin by define('jquery', ...   or by setting up a 'path' for it as 'jqeury' in AMD loader's config.
+*   .set() now HONORS the default value for the field as specificed in the HTML (VALUE="some default") and uses (places that value back into active value) when data for the field is not provided in the data. 
+    The version of jquery-inputs from which this one was cloned did NOT seem to honor the defaults and overrode those with "" (per my, possibly faulty, recollection).
 
 ## Usage
 
