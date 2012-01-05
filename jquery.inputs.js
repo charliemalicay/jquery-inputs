@@ -13,19 +13,18 @@
 	var window = this
 	, jquery_inputs_appender = function($){
 
-		var applyValueToScope = function(name, value, scope) {
-			var keychain = name.replace('_','.').split('.')
-				,lastkey = keychain.pop()
+		var applyValueToResults = function(namechain, value, scope) {
+			var lastkey = namechain.pop()
 				,currentscope = scope
 				,tmpscope = currentscope
-			keychain.forEach(function(key){
+			namechain.forEach(function(key){
 				tmpscope = currentscope[key]
 				if (tmpscope == null) {
 					currentscope[key] = {}
 				}
 				else {
 					if (!$.isPlainObject(tmpscope)) {
-						throw new TypeError("Value cannot be assigned to key '"+name+"' as another element on this path terminates with an non-object object.")
+						throw new TypeError("Value cannot be assigned to key '"+namechain.join(".")+"' as another element on this path terminates with an non-object object.")
 					}
 				}
 				currentscope = currentscope[key]
@@ -49,48 +48,72 @@
 					} else if (typeof(value) == 'string' && typeof(tmpscope) == 'string') {
 						currentscope[lastkey] = [tmpscope, value]
 					} else {
-						throw new TypeError("Value cannot be assigned to key '"+name+"' as another element on this path continues with object chain.")
+						throw new TypeError("Value cannot be assigned to key '"+namechain.join(".")+"' as another element on this path continues with object chain.")
 					}
 				}
 			}
 		}
-		, getfn = function(jqselector) {
-			/* when provided, jqselector is a string that allows to select only input elements that are children of 
-			the stated selector. The selector is still evaluated in the context of "this" - the element on which you call .inputs('get')
-			Example calls with selector:
+		, getNameChain = function(name, separators){
+			if (separators.length === 0){
+				return [name]
+			}
+			var sep = separators[0]
+			, index = 1
+			, len = separators.length
+			while (len > index) {
+				// found a bug in Chrome "one.two.three".replace(".","_") gives "one_two.three" WTF?!
+				// have to use .split(). They say it's even faster than replace...
+				name = name.split(separators[index]).join(sep)
+				index += 1
+			}
+			return name.split(sep)
+		}
+		, getSeparators = function(settings){
+			return (settings != null && settings.separators != null) ? settings.separators : ['|','_',':','.']
+		}
+		, getfn = function(jqselector, settings) {
+			/* when provided, jqselector is a string that allows to select only input elements within the jQuery object
+			that match the selector The selector is still evaluated in the context of "this" - the element on which you call
+			.inputs('get') Example calls with selector:
 			$(elem).inputs('get', '.changed')
 			This way only :input-matching elems that either have class 'changed' or are children of elems with class 'changed'
 			will be selected.
+			
+			If you need to pass in settings and NO selector pass falsy value for selector text.
+			
 			*/
 			var $i
 			if (jqselector) {
-				$i = $(jqselector, this) // 'this' can be non-form. $.serialize* do not work on non-form or non-input obj. 
-				$i = $i.filter(':input').add($i.find(':input'))
+				$i = $(jqselector, this)  
 			} else {
-				$i = $(':input', this) // 'this' can be non-form. $.serialize* do not work on non-form or non-input obj. 
+				$i = $(this)  
 			}
+			// 'this' can be non-form. $.serialize* do not work on non-form or non-input obj. Need to narrow it down to individual inputs.
+			$i = $i.filter(':input').add($i.find(':input'))
 	
-			var scope = {}
+			var results = {}
+			, separators = getSeparators(settings)
 			$.each(
 				$i.serializeArray()
-				, function(){ 
-					applyValueToScope(this.name, this.value, scope) 
+				, function(){
+					applyValueToResults(getNameChain(this.name, separators), this.value, results)
 				}
 			)
-			return scope
+			return results
 		}
-		, setfn = function(values) {
+		, setfn = function(values, settings) {
 			// could be any element with nested inputs)
 			var $form = $(this)
+			, separators = getSeparators(settings)
 			// loop through form inputs.
 			// this convoluted selector allows us to find inputs
 			// directly in already-selected elements and in their descendants.
 			$form.find(':input').add($form.filter(':input')).each(function(){
 				var $input = $(this)
-				, keys = $input.prop('name').replace('_','.').split('.')
+				, namechain = getNameChain( $input.prop('name'), separators )
 				, setflag = true
 				, scope = values
-				keys.forEach( function(key) {
+				namechain.forEach( function(key) {
 					try {
 					   scope = scope[key]
 					   if( scope == undefined ) {
