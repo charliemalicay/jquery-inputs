@@ -2,30 +2,30 @@
   jquery-inputs is a jQuery plugin that allows set/get on form inputs using hierarchical JSON structures
 
   https://github.com/willowsystems/jquery-inputs
-  Originally a fork of http://github.com/dshimkoski/jquery-inputs/
- 
+
   MIT license: http://www.opensource.org/licenses/mit-license.php
- 
+
+  Copyright (c) 2012, Willow Systems Corporation (ddotsenko -[at]- willow-systems.com )
   Copyright (c) 2011, Denny Shimkoski (denny.webdev -[at]- gmail -[dot]- com )
-  Copyright (c) 2012, Willow Systems Corporation (techs -[at]- willow-systems.com )
  */
 (function(){
+	'use strict'
+
 	var window = this
-	, jquery_inputs_appender = function($){
+
+	var jquery_inputs_appender = function($){
 
 		var applyValueToResults = function(namechain, value, scope) {
 			var lastkey = namechain.pop()
-				,currentscope = scope
-				,tmpscope = currentscope
+			, currentscope = scope
+			, tmpscope = currentscope
+
 			namechain.forEach(function(key){
 				tmpscope = currentscope[key]
 				if (tmpscope == null) {
 					currentscope[key] = {}
-				}
-				else {
-					if (!$.isPlainObject(tmpscope)) {
-						throw new TypeError("Value cannot be assigned to key '"+namechain.join(".")+"' as another element on this path terminates with an non-object object.")
-					}
+				} else if (!$.isPlainObject(tmpscope)) {
+					throw new TypeError("Value '"+value+"' cannot be assigned to key '"+namechain.join(".")+"' as another element on this path terminates with an non-object object.")
 				}
 				currentscope = currentscope[key]
 			})
@@ -40,7 +40,7 @@
 				// our scoped value is still in tmpscope from 5+ lines above
 				if (value != tmpscope) {
 					if (Array.isArray(tmpscope) && typeof(value) == 'string') {
-						// we determined earlier that this is going to be a ordered group of values. 
+						// we determined earlier that this is going to be a ordered group of values.
 						// Likely a result of checkbox or radio elem group.
 						if (tmpscope.indexOf(value) == -1) {
 							tmpscope.push(value)
@@ -60,6 +60,7 @@
 			var sep = separators[0]
 			, index = 1
 			, len = separators.length
+
 			while (len > index) {
 				// found a bug in Chrome "one.two.three".replace(".","_") gives "one_two.three" WTF?!
 				// have to use .split(). They say it's even faster than replace...
@@ -78,19 +79,19 @@
 			$(elem).inputs('get', '.changed')
 			This way only :input-matching elems that either have class 'changed' or are children of elems with class 'changed'
 			will be selected.
-			
+
 			If you need to pass in settings and NO selector pass falsy value for selector text.
-			
+
 			*/
 			var $i
 			if (jqselector) {
-				$i = $(jqselector, this)  
+				$i = $(jqselector, this)
 			} else {
-				$i = $(this)  
+				$i = $(this)
 			}
 			// 'this' can be non-form. $.serialize* do not work on non-form or non-input obj. Need to narrow it down to individual inputs.
 			$i = $i.filter(':input').add($i.find(':input'))
-	
+
 			var results = {}
 			, separators = getSeparators(settings)
 			$.each(
@@ -115,21 +116,21 @@
 				, scope = values
 				namechain.forEach( function(key) {
 					try {
-					   scope = scope[key]
-					   if( scope == undefined ) {
-						   throw new TypeError("jQuery.Input: Path traversal in data object for '"+ key +"' of '" + $input.prop('name') + "' was cut short by an incompatible object")
-					   }
+						scope = scope[key]
+						if( scope == undefined ) {
+							throw new TypeError("jQuery.Input: Path traversal in data object for '"+ key +"' of '" + $input.prop('name') + "' was cut short by an incompatible object")
+						}
 					}
 					catch (ex) {
-					   setflag = false
+						setflag = false
 					}
 				})
-				
+
 				if ( $input.is(':checkbox, :radio') ) {
 					$input.prop('checked', false).data('defaultValue', false)
 					if ( setflag ) {
 						if ( Array.isArray(scope) ) {
-							if  ( scope.some( 
+							if  ( scope.some(
 									function(item) {
 										return ( $input.prop('value') == new String(item) )
 									})
@@ -161,16 +162,19 @@
 		}
 
 		$.fn.inputs = function(method) {
+			if (!method) {
+				method = 'get'
+			}
 			if ( methods[method] ) {
 				return methods[ method ].apply( this, Array.prototype.slice.call( arguments, 1 ))
 			} else {
-				$.error( 'Method ' +  method + ' does not exist on jQuery.inputs' )
+				$.error( 'Method "' +  method + '" does not exist on jQuery.inputs' )
 			}
 		}
 
 		return $
 	}
-	
+
 	if ( typeof define === "function" && define.amd != null) {
 		// AMD-loader compatible resource declaration
 		define(['jquery'], function($){if($.fn.inputs == null){return jquery_inputs_appender($)}else{return $}} )
