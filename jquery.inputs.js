@@ -1,8 +1,6 @@
-/* @license
-  jquery-inputs is a jQuery plugin that allows set/get on form inputs using hierarchical JSON structures
-
+/** @preserve jQuery-inputs {{BUILDDATE}} {{COMMITGUID}}
+  A jQuery plugin that allows set/get on form inputs using hierarchical JSON structures
   https://github.com/willowsystems/jquery-inputs
-
   MIT license: http://www.opensource.org/licenses/mit-license.php
 
   Copyright (c) 2012, Willow Systems Corporation (ddotsenko -[at]- willow-systems.com )
